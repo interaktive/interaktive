@@ -33,7 +33,9 @@ Interaktive JS works with **.obj** 3D models files. Create a directory with the 
 
 1. Download and use Interaktive JS API in your HTML document
 
-      <script src="interaktive.min.js"></script>
+  ```javascript
+  <script src="interaktive.min.js"></script>
+  ```
 
 1. Connect your Leap Motion device
 
