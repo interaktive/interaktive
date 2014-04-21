@@ -44,3 +44,7 @@ Interaktive JS works with **.obj** 3D models files. Create a directory with the 
 You'll see on-screen instructions to load **.obj** files found under the `models` directory living in the same directory as your HTML document.
 
 After you load a 3D model you can manipulate it with the movements described under the 'Actions' section.
+
+## License
+
+Interaktive is released under the [MIT License](http://www.opensource.org/licenses/MIT).
