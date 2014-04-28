@@ -43,10 +43,15 @@
 			var camera, scene, renderer;
 
 			var mouseX = 0, mouseY = 0;
+			var mouseXAfter = 0, mouseYAfter = 0;
+			var movement = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
+			//variables de movimiento
+			var tempMouseX=0;
+			var tempMouseY=0;
+			var tempMouseZ=0;
 
 			init();
 			animate();
@@ -57,8 +62,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 100;
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				//aqui movemos la camara de 0 a 180 con z positiva
+				camera.position.z = 400;
+				camera.position.x = 0;
+				camera.position.y = 0;
 
 				// scene
 
@@ -70,6 +78,10 @@
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 1 );
 				scene.add( directionalLight );
+
+				var directionalLight2 = new THREE.DirectionalLight( 0xffeedd );
+				directionalLight2.position.set( 0, 0, -1 );
+				scene.add( directionalLight2 );
 
 				// texture
 
@@ -107,7 +119,7 @@
 
 					} );
 
-					object.position.y = - 80;
+					object.position.y = -80;
 					scene.add( object );
 
 				} );
@@ -143,6 +155,10 @@
 				mouseX = ( event.clientX - windowHalfX ) / 2;
 				mouseY = ( event.clientY - windowHalfY ) / 2;
 
+				movement = event.clientX ;
+				mouseXAfter = mouseX;
+				console.log(movement);
+
 			}
 
 			//
@@ -156,8 +172,9 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * .5;
+				//console.log(camera.position.x);
+				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
 
