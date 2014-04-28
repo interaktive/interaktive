@@ -36,8 +36,9 @@
 				//extraemos el archivo seleccionado
 				//echo '<p>hola </p>';
 				
-				$name = $_POST['modelo']; 
-				echo "<p>".$name."</p>";
+				$modeloUsado = $_GET['modelo']; 
+				echo "<p>".$modeloUsado."</p>";
+				$rutaModelo="upload/json/".$modeloUsado;
 
 			?>
 			<a href="menuArchivos.php">Menu archivos </a>
@@ -201,9 +202,11 @@
 				var callbackMale = function ( geometry, materials ) { createScene( geometry, materials, 0, -80, 0, 0 ) };
 				var callbackFemale = function ( geometry, materials ) { createScene( geometry, materials, -80, FLOOR, 50, 0 ) };
 				
+				//pasamos la variable de php a js
+				 var jsvar  = '<?php echo $rutaModelo; ?>';
 
 				//se carga objeto con su textura
-				loader.load( "upload/json/banana_obj.js", callbackMale );
+				loader.load( jsvar, callbackMale );
 				//loader.load( "obj/female02/Female02_slim.js", callbackFemale );
 
 				//

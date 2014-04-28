@@ -44,6 +44,9 @@ $maxKB=10000*800;
 $allowedExts = array("obj");
 $temp = explode(".", $_FILES["file"]["name"]);
 $extension = end($temp);
+//separamos el nombre del archivo
+$string = $_FILES["file"]["name"];
+$tokenName = strtok($string, ".");
 
 
 if ((($_FILES["file"]["type"] == "application/octet-stream"))
@@ -60,12 +63,16 @@ if ((($_FILES["file"]["type"] == "application/octet-stream"))
       echo $_FILES["file"]["name"] . " already exists. ";
     } else {
     	move_uploaded_file($_FILES['file']['tmp_name'], "upload/obj/" . $_FILES["file"]["name"]);
-    	$command = escapeshellcmd('/usr/bin/python2.7 upload/convert_obj_three.py -i upload/obj/banana_obj.obj -o upload/json/banana_obj.js');
+    	$command = escapeshellcmd('/usr/bin/python2.7 upload/convert_obj_three.py -i upload/obj/'.$tokenName.'.obj -o upload/json/'.$tokenName.'.js');
     	$output = shell_exec($command);
 		echo "funciona: ".$output;
 		echo "<br />";
       //move_uploaded_file($_FILES["file"]["tmp_name"],"nuevosObjetos/" . $_FILES["file"]["name"]);
       echo "Stored in: " . "upload/obj/" . $_FILES["file"]["name"];
+      echo "<br/>";
+      echo "nombre: ".$_FILES["file"]["name"];
+      echo "nombre2: ".$tokenName;
+      header('Location: menuArchivos.php');
     }
   }
 } else {
