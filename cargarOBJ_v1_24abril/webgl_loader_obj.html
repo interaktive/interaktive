@@ -52,6 +52,10 @@
 			var tempMouseX=0;
 			var tempMouseY=0;
 			var tempMouseZ=0;
+			//controla el ciclo de movimiento
+			var mover=false;
+			//bandera de control para direccion
+					var aumenta=true;
 
 			init();
 			animate();
@@ -64,8 +68,8 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				//aqui movemos la camara de 0 a 180 con z positiva
-				camera.position.z = 400;
-				camera.position.x = 0;
+				camera.position.z = 0;
+				camera.position.x = -400;
 				camera.position.y = 0;
 
 				// scene
@@ -88,7 +92,7 @@
 				var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
 
-					console.log( item, loaded, total );
+					//console.log( item, loaded, total );
 
 				};
 
@@ -120,6 +124,7 @@
 					} );
 
 					object.position.y = -80;
+					
 					scene.add( object );
 
 				} );
@@ -130,8 +135,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
+				document.addEventListener( 'mousedown', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseMoveStop, false );
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -152,12 +157,38 @@
 
 			function onDocumentMouseMove( event ) {
 
+				//cambia le ciclo para que el objeto se mueva
+				mover=true;
+
 				mouseX = ( event.clientX - windowHalfX ) / 2;
 				mouseY = ( event.clientY - windowHalfY ) / 2;
+				
 
-				movement = event.clientX ;
+				//como saber si un punto se mueve en x hacia la izquierda o hacia la derecha
+
+				movement = event.clientX;//event.clientX ;
+				
+				tempMouseX+=movement;
+				tempMouseY+=event.clientY;
 				mouseXAfter = mouseX;
-				console.log(movement);
+
+
+
+				//detectar movimiento mouse
+				
+
+			}
+
+
+
+			//apaga el ciclo
+			function onDocumentMouseMoveStop( event ) {
+
+				//cambia le ciclo para que el objeto se mueva
+				mover=false;
+				
+				
+				
 
 			}
 
@@ -172,10 +203,187 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .5;
+				
+				
+				//funcion para mover el objeto
+				
+				if(mover){
+					//imprime las coordenadas de lo se esta moviendo
+					//console.log("x:"+camera.position.x);
+					//console.log("y:"+camera.position.y);
+					//console.log("z:"+camera.position.z);
+					//verificamos las variables de posicion
+					var tempCamaraX=camera.position.x;
+					var tempCamaraZ=camera.position.z;
+					var tempCamaraY=camera.position.y;
+					//variables para controlar el cuadrante de donde estas y a donde vamos
+					var cUNO=false;
+					var cDOS=false;
+					var cTRES=false;
+					var cCUATRO=true;
+					
+					//coordenadas cuando
+					//CUADRANTE 4
+					//x=0 -> 600
+					//z=400->0
+					//y=0
+					if(aumenta){
+					if((tempCamaraX>=-400 && tempCamaraX<0) ){
+						camera.position.x+=5;
+						camera.position.z=400+camera.position.x;
+						//camera.position.z=300+Math.sqrt(-1*tempCamaraX+tempCamaraZ);
+						
+						console.log("1x:"+camera.position.x);
+					//console.log("y:"+camera.position.y);
+					console.log("1z:"+camera.position.z);
+						
+						
+						}else if((tempCamaraX>=0 && tempCamaraX<=400) ){
+						camera.position.x+=5;
+						camera.position.z=400-camera.position.x;
+						//camera.position.z=300+Math.sqrt(tempCamaraX+tempCamaraZ);
+						
+						console.log("2x:"+camera.position.x);
+					//console.log("y:"+camera.position.y);
+					console.log("2z:"+camera.position.z);
+						
+					
+						}
+
+					}
+						//cambia el flujo del movimiento
+					if(tempCamaraX==400){
+						aumenta=false;
+					}
+					console.log("BANDERAFinal:"+aumenta);
+					//inviete el flujo
+					if(!aumenta){
+					if((tempCamaraX>=-400 && tempCamaraX<0) ){
+						camera.position.x=tempCamaraX-5;
+						camera.position.z=-1*(400+camera.position.x);
+						//camera.position.z=300+Math.sqrt(-1*tempCamaraX+tempCamaraZ);
+						
+						console.log("3x:"+camera.position.x);
+					//console.log("y:"+camera.position.y);
+					console.log("3z:"+camera.position.z);
+						
+						
+						}else if((tempCamaraX>=0 && tempCamaraX<=400) ){
+						camera.position.x=tempCamaraX-5;
+						camera.position.z=-1*(400-camera.position.x);
+						//camera.position.z=300+Math.sqrt(tempCamaraX+tempCamaraZ);
+						
+						console.log("4x:"+camera.position.x);
+					//console.log("y:"+camera.position.y);
+					console.log("4z:"+camera.position.z);
+						
+						
+						}
+					}
+
+
+
+						//bandera de control para disminuye
+
+						/*else if((tempCamaraZ>=0 && tempCamaraZ<=400) ){
+						camera.position.x+=5;
+						camera.position.z=300+Math.sqrt(tempCamaraX+tempCamaraZ);
+						
+						console.log("x:"+camera.position.x);
+					//console.log("y:"+camera.position.y);
+					console.log("z:"+camera.position.z);
+						
+						
+						}
+					
+					
+					
+					//CUADRANTE 1
+					//x= 600->0
+					//z=0->-400
+					//y=0
+					 if( (tempCamaraX<=600 && tempCamaraX>=0) && (tempCamaraZ<=0 && tempCamaraZ>=-400) && cUNO){
+						camera.position.x-=10;
+						//camera.position.z+=7;
+						console.log("x:"+camera.position.x);
+					//console.log("y:"+camera.position.y);
+					console.log("z:"+camera.position.z);
+						//apagamos el cuadrante cuatro y prendemos el cuadrante 1
+						console.log("Cuadrante1 cCuatro:"+cCUATRO);
+						console.log("Cuadrante1 cUNO:"+cUNO);
+						//cCUATRO=false;
+						//cUNO=true;
+						}
+					
+					
+					
+					*/
+					//CUADRANTE 3
+					//x=-600-> 0
+					//z=0->-400
+					//y=0
+					
+					
+					//CUADRANTE 2
+					//x=-600-> 0
+					//z=-400->0
+					//y=0
+					
+					
+					
+					
+					}
+				//funcion en Y cuando el mouse no se mueve
+				/*
+				console.log(tempMouseY);
+				if(camera.position.y>800){
+
+					camera.position.y=-800;
+				}
+				if(camera.position.y<800){
+
+					camera.position.y+=tempMouseY*0.05;
+				}*/
+
+
+				//funcion en X cuando el mouse no se mueve
+				/*
+				if(mover){
+					
+					var tempCamaraPositivoX=camera.position.x;
+					var tempCamaraPositivoZ=camera.position.z;
+					var tempCamaraPositivoY=camera.position.y;
+				console.log("x:"+camera.position.x);
+				console.log("z:"+camera.position.z);
+
+				if(tempCamaraPositivoX>=500){
+
+					//tempMouseX=0;
+					camera.position.x-=100*0.05;
+					camera.position.z=120;
+				}
+				if(tempCamaraPositivoX<500 ){
+					camera.position.z-=100*0.05;
+					camera.position.x+=100*0.05;
+				}
+				}
+				*/
+
+				/*
+				if(tempMouseX<600){
+					console.log(tempMouseX);
+					
+					camera.position.x += mouseX - camera.position.x*.05;
+				}
+				if(tempMouseX>600){
+					tempMouseX=0;
+					camera.position.x =0;
+				}*/
+				//( mouseX - camera.position.x ) * .5;
+				
 				//console.log(camera.position.x);
 				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
+				//camera.position.x += ( - mouseY - camera.position.x ) * .05;
 				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
