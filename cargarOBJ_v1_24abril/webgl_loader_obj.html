@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+  		<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script src="http://js.leapmotion.com/0.2.2/leap.min.js"></script>
+
 		<title>three.js webgl - loaders - OBJ loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -37,25 +41,52 @@
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
+			var movX = 0, movY = 0, movZ = 0;
+			$(document).ready(function() {
+			var ctl = new Leap.Controller({enableGestures: true});
+
+			var swiper = ctl.gesture('swipe');
+
+			var totalDistance = 0;
+
+			var tolerance = 50;
+			var cooloff = 75;
+
+			var move = _.debounce(function(xDir, yDir, zDir) {
+				if (xDir != 0) {
+					console.log('x: ' + xDir);
+					movX = 100 * xDir;
+				} else if (yDir != 0) {
+					console.log('y: ' + yDir);
+					movY = 100 * yDir;
+				} else if (zDir != 0) {
+					console.log('z: ' + zDir);
+					movZ = 100 * zDir;
+				}
+			}, cooloff);
+
+			swiper.update(function(g) {
+				if (Math.abs(g.translation()[0]) > tolerance || Math.abs(g.translation()[1]) > tolerance || Math.abs(g.translation()[2]) > tolerance) {
+				var xDir = Math.abs(g.translation()[0]) > tolerance ? (g.translation()[0] > 0 ? -1 : 1) : 0;
+				var yDir = Math.abs(g.translation()[1]) > tolerance ? (g.translation()[1] < 0 ? -1 : 1) : 0;
+				var zDir = Math.abs(g.translation()[2]) > tolerance ? (g.translation()[2] < 0 ? -1 : 1) : 0;
+				move(xDir, yDir, zDir);
+				}
+			});
+
+			ctl.connect();
+			})
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var mouseX = 0, mouseY = 0;
-			var mouseXAfter = 0, mouseYAfter = 0;
-			var movement = 0;
+			//var mouseX = 0, mouseY = 0;
+			//var movement = 0;
+			var atFront = true;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-			//variables de movimiento
-			var tempMouseX=0;
-			var tempMouseY=0;
-			var tempMouseZ=0;
-			//controla el ciclo de movimiento
-			var mover=false;
-			//bandera de control para direccion
-					var aumenta=true;
 
 			init();
 			animate();
@@ -68,12 +99,11 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				//aqui movemos la camara de 0 a 180 con z positiva
-				camera.position.z = 0;
-				camera.position.x = -400;
+				camera.position.x = 0;
 				camera.position.y = 0;
+				camera.position.z = 400;
 
 				// scene
-
 				scene = new THREE.Scene();
 
 				var ambient = new THREE.AmbientLight( 0x101030 );
@@ -87,28 +117,17 @@
 				directionalLight2.position.set( 0, 0, -1 );
 				scene.add( directionalLight2 );
 
-				// texture
-
 				var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
-
-					//console.log( item, loaded, total );
-
 				};
 
 				var texture = new THREE.Texture();
 
 				var loader = new THREE.ImageLoader( manager );
-				//esta parte carga la textura
 				loader.load( 'textures/disturb.jpg', function ( image ) {
-
 					texture.image = image;
 					texture.needsUpdate = true;
-
 				} );
-
-				// model
-
 				var loader = new THREE.OBJLoader( manager );
 				//esta parte carga el objeto
 				loader.load( 'obj/male02/male02.obj', function ( object ) {
@@ -116,15 +135,12 @@
 					object.traverse( function ( child ) {
 
 						if ( child instanceof THREE.Mesh ) {
-
 							child.material.map = texture;
-
 						}
 
 					} );
 
 					object.position.y = -80;
-					
 					scene.add( object );
 
 				} );
@@ -135,13 +151,30 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousedown', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseMoveStop, false );
-				//
+				//document.addEventListener( 'mousedown', onDocumentMouseMove, false );
+				//document.addEventListener( 'mouseup', onDocumentMouseMoveStop, false );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener('resize', onWindowResize, false );
 
+				document.addEventListener("keydown", onKeyDown, false);
+				function onKeyDown(e){
+					switch(e.keyCode) {
+						case 37:
+							movX = -100;
+						    break;
+						case 38:
+						    movZ = 100
+						    break;
+						case 39:
+						    movX = 100;
+						    break;
+						case 40:
+						    movZ = -100
+						    break;  
+						}
+					}
 			}
+
 
 			function onWindowResize() {
 
@@ -155,6 +188,27 @@
 
 			}
 
+			/*
+			function onKeyDown(e){
+				switch(e.keyCode) {
+					case 37:
+						movX = 1;
+						console.log('Entra');
+					    break;
+					case 38:
+					    // up key pressed
+					    break;
+					case 39:
+					    movX = -1;
+					    break;
+					case 40:
+					    // down key pressed
+					    break;  
+					}
+			}
+			*/
+
+			/*
 			function onDocumentMouseMove( event ) {
 
 				//cambia le ciclo para que el objeto se mueva
@@ -162,8 +216,6 @@
 
 				mouseX = ( event.clientX - windowHalfX ) / 2;
 				mouseY = ( event.clientY - windowHalfY ) / 2;
-				
-
 				//como saber si un punto se mueve en x hacia la izquierda o hacia la derecha
 
 				movement = event.clientX;//event.clientX ;
@@ -171,28 +223,18 @@
 				tempMouseX+=movement;
 				tempMouseY+=event.clientY;
 				mouseXAfter = mouseX;
-
-
-
-				//detectar movimiento mouse
-				
-
 			}
 
 
 
 			//apaga el ciclo
 			function onDocumentMouseMoveStop( event ) {
-
 				//cambia le ciclo para que el objeto se mueva
 				mover=false;
-				
-				
-				
-
 			}
 
 			//
+			*/
 
 			function animate() {
 
@@ -203,16 +245,48 @@
 
 			function render() {
 
+				if (movX != 0){
+					if (atFront) {
+						camera.position.x += movX;
+					} else {
+						camera.position.x += -movX;
+					}
+					if (movX == -100 && camera.position.x == -500){
+						camera.position.z = -1 * camera.position.z;
+						atFront = false;
+					} else if (movX == 100 && camera.position.x == -500){
+						camera.position.z = -1 * camera.position.z;
+						atFront = true;
+					} else if (movX == 100 && camera.position.x == 500){
+						camera.position.z = -1 * camera.position.z;
+						atFront = false;
+					} else if (movX == -100 && camera.position.x == 500){
+						camera.position.z = -1 * camera.position.z;
+						atFront = true;
+					}
+
+					movX = 0;
+					console.log('X: ' + camera.position.x + ' Y: ' + camera.position.y + ' Z: ' + camera.position.z);
+				}
+				if (movY != 0){
+					camera.position.y += movY;
+					movY = 0;
+					console.log('X: ' + camera.position.x + ' Y: ' + camera.position.y + ' Z: ' + camera.position.z);
+				}
+				if (movZ != 0){
+					camera.position.z += movZ;
+					if (movZ == -50 && camera.position.z == 0){
+						atFront = false;
+					} else if (movZ == 50 && camera.position.z == 0){
+						atFront = true;
+					}
+					movZ = 0;
+					console.log('X: ' + camera.position.x + ' Y: ' + camera.position.y + ' Z: ' + camera.position.z);
+				}
 				
-				
+				/*
 				//funcion para mover el objeto
-				
 				if(mover){
-					//imprime las coordenadas de lo se esta moviendo
-					//console.log("x:"+camera.position.x);
-					//console.log("y:"+camera.position.y);
-					//console.log("z:"+camera.position.z);
-					//verificamos las variables de posicion
 					var tempCamaraX=camera.position.x;
 					var tempCamaraZ=camera.position.z;
 					var tempCamaraY=camera.position.y;
@@ -221,12 +295,7 @@
 					var cDOS=false;
 					var cTRES=false;
 					var cCUATRO=true;
-					
-					//coordenadas cuando
-					//CUADRANTE 4
-					//x=0 -> 600
-					//z=400->0
-					//y=0
+
 					if(aumenta){
 					if((tempCamaraX>=-400 && tempCamaraX<0) ){
 						camera.position.x+=5;
@@ -258,134 +327,29 @@
 					console.log("BANDERAFinal:"+aumenta);
 					//inviete el flujo
 					if(!aumenta){
-					if((tempCamaraX>=-400 && tempCamaraX<0) ){
-						camera.position.x=tempCamaraX-5;
-						camera.position.z=-1*(400+camera.position.x);
-						//camera.position.z=300+Math.sqrt(-1*tempCamaraX+tempCamaraZ);
-						
-						console.log("3x:"+camera.position.x);
-					//console.log("y:"+camera.position.y);
-					console.log("3z:"+camera.position.z);
-						
-						
-						}else if((tempCamaraX>=0 && tempCamaraX<=400) ){
-						camera.position.x=tempCamaraX-5;
-						camera.position.z=-1*(400-camera.position.x);
-						//camera.position.z=300+Math.sqrt(tempCamaraX+tempCamaraZ);
-						
-						console.log("4x:"+camera.position.x);
-					//console.log("y:"+camera.position.y);
-					console.log("4z:"+camera.position.z);
-						
-						
+						if((tempCamaraX>=-400 && tempCamaraX<0) ){
+							camera.position.x=tempCamaraX-5;
+							camera.position.z=-1*(400+camera.position.x);
+							//camera.position.z=300+Math.sqrt(-1*tempCamaraX+tempCamaraZ);
+							
+							console.log("3x:"+camera.position.x);
+							//console.log("y:"+camera.position.y);
+							console.log("3z:"+camera.position.z);
+							
+							
+							}else if((tempCamaraX>=0 && tempCamaraX<=400) ){
+							camera.position.x=tempCamaraX-5;
+							camera.position.z=-1*(400-camera.position.x);
+							console.log("4x:"+camera.position.x);
+							//console.log("y:"+camera.position.y);
+							console.log("4z:"+camera.position.z);
+
+							}
 						}
 					}
-
-
-
-						//bandera de control para disminuye
-
-						/*else if((tempCamaraZ>=0 && tempCamaraZ<=400) ){
-						camera.position.x+=5;
-						camera.position.z=300+Math.sqrt(tempCamaraX+tempCamaraZ);
-						
-						console.log("x:"+camera.position.x);
-					//console.log("y:"+camera.position.y);
-					console.log("z:"+camera.position.z);
-						
-						
-						}
-					
-					
-					
-					//CUADRANTE 1
-					//x= 600->0
-					//z=0->-400
-					//y=0
-					 if( (tempCamaraX<=600 && tempCamaraX>=0) && (tempCamaraZ<=0 && tempCamaraZ>=-400) && cUNO){
-						camera.position.x-=10;
-						//camera.position.z+=7;
-						console.log("x:"+camera.position.x);
-					//console.log("y:"+camera.position.y);
-					console.log("z:"+camera.position.z);
-						//apagamos el cuadrante cuatro y prendemos el cuadrante 1
-						console.log("Cuadrante1 cCuatro:"+cCUATRO);
-						console.log("Cuadrante1 cUNO:"+cUNO);
-						//cCUATRO=false;
-						//cUNO=true;
-						}
-					
-					
-					
-					*/
-					//CUADRANTE 3
-					//x=-600-> 0
-					//z=0->-400
-					//y=0
-					
-					
-					//CUADRANTE 2
-					//x=-600-> 0
-					//z=-400->0
-					//y=0
-					
-					
-					
-					
-					}
-				//funcion en Y cuando el mouse no se mueve
-				/*
-				console.log(tempMouseY);
-				if(camera.position.y>800){
-
-					camera.position.y=-800;
-				}
-				if(camera.position.y<800){
-
-					camera.position.y+=tempMouseY*0.05;
-				}*/
-
-
-				//funcion en X cuando el mouse no se mueve
-				/*
-				if(mover){
-					
-					var tempCamaraPositivoX=camera.position.x;
-					var tempCamaraPositivoZ=camera.position.z;
-					var tempCamaraPositivoY=camera.position.y;
-				console.log("x:"+camera.position.x);
-				console.log("z:"+camera.position.z);
-
-				if(tempCamaraPositivoX>=500){
-
-					//tempMouseX=0;
-					camera.position.x-=100*0.05;
-					camera.position.z=120;
-				}
-				if(tempCamaraPositivoX<500 ){
-					camera.position.z-=100*0.05;
-					camera.position.x+=100*0.05;
-				}
-				}
 				*/
 
-				/*
-				if(tempMouseX<600){
-					console.log(tempMouseX);
-					
-					camera.position.x += mouseX - camera.position.x*.05;
-				}
-				if(tempMouseX>600){
-					tempMouseX=0;
-					camera.position.x =0;
-				}*/
-				//( mouseX - camera.position.x ) * .5;
-				
-				//console.log(camera.position.x);
-				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				//camera.position.x += ( - mouseY - camera.position.x ) * .05;
 				camera.lookAt( scene.position );
-
 				renderer.render( scene, camera );
 
 			}
