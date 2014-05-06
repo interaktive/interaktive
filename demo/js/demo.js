@@ -1,4 +1,6 @@
 var dirY = 0, dirZ = 0, orbitY = 0;
+var deltaDirY = 0, deltaDirZ = 0;
+var maxDelta = 100;
 var frameStep = 0.05;
 var frameDistance = 30;
 var statsEnabled=true;
@@ -11,23 +13,26 @@ var windowHalfY = window.innerHeight / 2;
 $(document).ready(function() {
 	var ctl = new Leap.Controller({enableGestures: true});
 	var swiper = ctl.gesture('swipe');
-	var tolerance = 75;
+	var tolerance = 75, cooldown = 200;
+
+  var updateDirs = _.debounce(function(auxOrbitY, auxDirY, auxDirZ) {
+    deltaDirY = 0, deltaDirZ = 0;
+    orbitY = auxOrbitY, dirY = auxDirY, dirZ = auxDirZ;
+  }, cooldown);
 
 	swiper.update(function(g) {
-    orbitY = 0, dirY = 0, dirZ = 0;
+    var auxOrbitY = 0, auxDirY = 0, auxDirZ = 0;
 
 		if (Math.abs(g.translation()[0]) > tolerance) {
-      orbitY = g.translation()[0] > 0 ? -1 : 1
+      auxOrbitY = g.translation()[0] > 0 ? -1 : 1
     } else if (Math.abs(g.translation()[1]) > tolerance) {
-      dirY = g.translation()[1] > 0 ? 1 : -1
+      auxDirY = g.translation()[1] > 0 ? 1 : -1
     } else if (Math.abs(g.translation()[2]) > tolerance) {
-      dirZ = g.translation()[2] > 0 ? -1 : 1
+      auxDirZ = g.translation()[2] > 0 ? -1 : 1
     }
-	});
 
-  swiper.stop(function() {
-    console.log('stop');
-  });
+    updateDirs(auxOrbitY, auxDirY, auxDirZ);
+	});
 
 	ctl.connect();
 })
@@ -41,17 +46,21 @@ function rotate() {
 
 // Acercar/alejar la cámara (mover posición Z)
 function scale() {
-  if ((dirZ == 1 && camera.position.z < 330) ||
-      (dirZ == -1 && camera.position.z > 100)) {
-    camera.position.z += (frameStep * 100 * dirZ);
+  if (((dirZ == 1 && camera.position.z < 330) ||
+      (dirZ == -1 && camera.position.z > 100)) && deltaDirZ < maxDelta) {
+    step = frameStep * 100 * dirZ;
+    camera.position.z += step;
+    deltaDirZ += Math.abs(step);
   }
 }
 
 // Trasladar el objeto arriba/abajo (mover posición Y)
 function translate() {
-  if ((dirY == 1 && object.position.y < 100) ||
-      (dirY == -1 && object.position.y > -200)) {
-    object.position.y += (frameStep * 50 * dirY);
+  if (((dirY == 1 && object.position.y < 100) ||
+      (dirY == -1 && object.position.y > -200)) && deltaDirY < maxDelta) {
+    step = frameStep * 100 * dirY;
+    object.position.y += step
+    deltaDirY += Math.abs(step);
   }
 }
 
