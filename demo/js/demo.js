@@ -136,6 +136,7 @@ function init() {
 }
 
 function onKeyDown(e) {
+  deltaDirY = 0, deltaDirZ = 0;
   dirY = 0, dirZ = 0, orbitY = 0;
 
 	switch (e.keyCode) {
