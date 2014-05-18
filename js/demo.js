@@ -24,11 +24,11 @@ $(document).ready(function() {
     var auxOrbitY = 0, auxDirY = 0, auxDirZ = 0;
 
 		if (Math.abs(g.translation()[0]) > tolerance) {
-      auxOrbitY = g.translation()[0] > 0 ? -1 : 1
+      auxOrbitY = g.translation()[0] > 0 ? -1 : 1;
     } else if (Math.abs(g.translation()[1]) > tolerance) {
-      auxDirY = g.translation()[1] > 0 ? 1 : -1
+      auxDirY = g.translation()[1] > 0 ? -1 : 1;
     } else if (Math.abs(g.translation()[2]) > tolerance) {
-      auxDirZ = g.translation()[2] > 0 ? -1 : 1
+      auxDirZ = g.translation()[2] > 0 ? -1 : 1;
     }
 
     updateDirs(auxOrbitY, auxDirY, auxDirZ);
@@ -97,7 +97,6 @@ function init() {
     log('Loaded', item, loaded + '/' + total);
   };
 
-  //cargamos el nuevo modelo
 	var loader = new THREE.JSONLoader();
 	loader.load(modelName, function(geometry, materials) {
 		object = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materials ) );
@@ -106,7 +105,7 @@ function init() {
 		object.position.y = -80;
 		object.position.z = 0;
 
-    object.scale.set( 1, 1, 1 );
+    object.scale.set(1, 1, 1);
 
 		scene.add(object);
     window.object = object
