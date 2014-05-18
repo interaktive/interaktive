@@ -3,8 +3,7 @@ var deltaDirY = 0, deltaDirZ = 0;
 var maxDelta = 100;
 var frameStep = 0.05;
 var frameDistance = 30;
-var statsEnabled=true;
-var container, stats, loader;
+var container, loader;
 var directionalLight, ambientLight;
 var camera, scene, renderer;
 var windowHalfX = window.innerWidth / 2;
@@ -12,7 +11,6 @@ var windowHalfY = window.innerHeight / 2;
 
 $(document).ready(function() {
 	var ctl = new Leap.Controller({enableGestures: true});
-	var swiper = ctl.gesture('swipe');
 	var tolerance = 75, cooldown = 200;
 
   var updateDirs = _.debounce(function(auxOrbitY, auxDirY, auxDirZ) {
@@ -20,19 +18,34 @@ $(document).ready(function() {
     orbitY = auxOrbitY, dirY = auxDirY, dirZ = auxDirZ;
   }, cooldown);
 
-	swiper.update(function(g) {
-    var auxOrbitY = 0, auxDirY = 0, auxDirZ = 0;
+  var showLeapFeedback = function() {
+    $('#leap-feedback').addClass('active');
+  }
 
-		if (Math.abs(g.translation()[0]) > tolerance) {
-      auxOrbitY = g.translation()[0] > 0 ? -1 : 1;
-    } else if (Math.abs(g.translation()[1]) > tolerance) {
-      auxDirY = g.translation()[1] > 0 ? -1 : 1;
-    } else if (Math.abs(g.translation()[2]) > tolerance) {
-      auxDirZ = g.translation()[2] > 0 ? -1 : 1;
-    }
+  var hideLeapFeedback = function() {
+    $('#leap-feedback').removeClass('active');
+  }
 
-    updateDirs(auxOrbitY, auxDirY, auxDirZ);
-	});
+	var swiper = ctl.gesture('swipe')
+    .start(function() {
+      showLeapFeedback();
+    })
+    .stop(function() {
+      hieLeapFeedback();
+    })
+	  .update(function(g) {
+      var auxOrbitY = 0, auxDirY = 0, auxDirZ = 0;
+
+		  if (Math.abs(g.translation()[0]) > tolerance) {
+        auxOrbitY = g.translation()[0] > 0 ? -1 : 1;
+      } else if (Math.abs(g.translation()[1]) > tolerance) {
+        auxDirY = g.translation()[1] > 0 ? -1 : 1;
+      } else if (Math.abs(g.translation()[2]) > tolerance) {
+        auxDirZ = g.translation()[2] > 0 ? -1 : 1;
+      }
+
+      updateDirs(auxOrbitY, auxDirY, auxDirZ);
+	  });
 
 	ctl.connect();
 })
@@ -93,9 +106,6 @@ function init() {
   scene.add(directionalLight);
 
 	var manager = new THREE.LoadingManager();
-	manager.onProgress = function(item, loaded, total) {
-    log('Loaded', item, loaded + '/' + total);
-  };
 
 	var loader = new THREE.JSONLoader();
 	loader.load(modelName, function(geometry, materials) {
@@ -114,12 +124,6 @@ function init() {
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	container.appendChild(renderer.domElement);
-
-  stats=new Stats();
-  stats.domElement.style.position='absolute';
-  stats.domElement.style.top='0px';
-  stats.domElement.style.zIndex=100;
-  container.appendChild(stats.domElement);
 
 	window.addEventListener('resize', onWindowResize, false);
 	document.addEventListener('keydown', onKeyDown, false);
@@ -164,7 +168,6 @@ function onWindowResize() {
 function animate() {
 	requestAnimationFrame(animate);
 	render();
-  if (statsEnabled) stats.update();
 }
 
 function render() {
@@ -175,10 +178,4 @@ function render() {
   translate();
 
 	renderer.render(scene, camera);
-}
-
-function log() {
-  var e = document.getElementById('log');
-  text = Array.prototype.join.call(arguments, ' ');
-  e.innerHTML = text + '<br/>' + e.innerHTML;
 }
