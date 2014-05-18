@@ -9,30 +9,32 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/demo.css" />
-		
+	<link href="css/esteticaGeneral.css" rel="stylesheet" type="text/css">	
 		
 	</head>
 
 	<body>
 		<div id="info">
-		  <a href="https://github.com/interaktive/interaktive"
-         target="_blank">Interaktive JS</a> 
-         
+		 <div id="encabezado2">
          <?php 
 				//extraemos el archivo seleccionado
 				//echo '<p>hola </p>';
 				
 				$modeloUsado = $_GET['modelo']; 
-				echo "-".$modeloUsado."-";
+				echo "Interakitve | Modelo: ".$modeloUsado." | ";
 				$rutaModelo="upload/json/".$modeloUsado;
 
 			?>
          
-         <a href="index.php">Menu archivos </a>
+         <a href="index.php">Inicio </a>
+     </div>
+     <div id="inferior2">
+			<span>&copy; Copyright | Interaktive 2014 | Abraham Mendoza,Daniel Fernandez, Javier Trevi&ntilde;o</span>
 		</div>
 
-    <div id="log">
-    </div>
+		</div>
+
+    
 
 		<script src="build/three.min.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
@@ -42,5 +44,5 @@
 		  var modelName  = '<?php echo $rutaModelo;?>';
 		</script>
 		<script src="js/demo.js"></script>
-	</body>
+			</body>
 </html>

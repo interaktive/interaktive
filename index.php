@@ -1,6 +1,11 @@
 <html>
+<link href="css/esteticaGeneral.css" rel="stylesheet" type="text/css">
 <body>
-<h1> Cargar Nuevo Archivo </h1>
+<div id="contenedorPrincipal">
+<div id="superior">
+<span id="encabezado">Interaktive</span>
+<hr>
+<span id="titulo"> Cargar nuevo modelo: </span>
 
             <form action="upload_file.php" method="post"
             enctype="multipart/form-data">
@@ -8,7 +13,7 @@
             <input type="file" name="file" id="file">
             <input type="submit" name="submit" value="Submit">
             </form>
-<h1> Lista de archivos </h1>
+<span id="titulo"> Lista de modelos disponibles: </span>
 
 <?php 
 
@@ -16,7 +21,12 @@ include 'listarArchivos.php';
 leer_archivos_y_directorios('upload/json/');
 
 ?>
+</div>
+<div id="inferior">
+	<span>&copy; Copyright | Interaktive 2014 | Abraham Mendoza,Daniel Fernandez, Javier Trevi&ntilde;o</span>
 
+</div>
+</div>
 
 
 </body>
