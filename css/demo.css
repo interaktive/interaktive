@@ -8,16 +8,6 @@ body {
 
 }
 
-#info {
-	color: #fff;
-	position: absolute;
-	top: 10px;
-	width: 100%;
-	text-align: center;
-	z-index: 100;
-	display: block;
-}
-
 #info a,
 .button {
   color: #fff;

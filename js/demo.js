@@ -122,6 +122,7 @@ function init() {
 	});
 
 	renderer = new THREE.WebGLRenderer();
+  renderer.setClearColor(0x4a6084, 1);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	container.appendChild(renderer.domElement);
 

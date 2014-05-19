@@ -15,7 +15,7 @@ function leer_archivos_y_directorios()
                 // Si quisieramos mostrar todo el contenido del directorio pondríamos lo siguiente:
                 // echo '<br />' . $file . '<br />';
                 // Pero como lo que queremos es mostrar todos los archivos excepto "." y ".."
-                if ($archivo!="." && $archivo!="..")
+                if ($archivo[0]!="." && $archivo!="..")
                 {
                     $ruta_completa = $ruta . '/' . $archivo;
  
@@ -31,7 +31,7 @@ function leer_archivos_y_directorios()
                     {
                         //inicamos el form que listara los archivos
                         echo "<form name='input' action='mostrarModelo.php' method='get'>
-                        <input type='radio' name='modelo' value='$archivo'>$archivo<br>";
+                        <label><input type='radio' name='modelo' value='$archivo'>$archivo</label><br>";
                         //echo '' . $archivo . '<br />';
                     }
                 }
