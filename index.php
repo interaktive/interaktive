@@ -9,9 +9,9 @@
 
             <form action="upload_file.php" method="post"
             enctype="multipart/form-data">
-            <label for="file">Filename:</label>
+            <label for="file">Archivo:</label>
             <input type="file" name="file" id="file">
-            <input type="submit" name="submit" value="Submit">
+            <input type="submit" name="submit" value="Cargar Archivo">
             </form>
 <span id="titulo"> Lista de modelos disponibles: </span>
 
