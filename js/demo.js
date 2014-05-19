@@ -31,7 +31,7 @@ $(document).ready(function() {
       showLeapFeedback();
     })
     .stop(function() {
-      hieLeapFeedback();
+      hideLeapFeedback();
     })
 	  .update(function(g) {
       var auxOrbitY = 0, auxDirY = 0, auxDirZ = 0;
